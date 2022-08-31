@@ -1,0 +1,25 @@
+name: CI/CD
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_SERVER }}
+          username: ${{ secrets.HOST_SERVER_USER }}
+          password: ${{ secrets.HOST_SERVER_PASSWORD }}
+          port: ${{ secrets.HOST_SERVER_PORT }}
+          script: |
+            cd ${{ secrets.HOST_SERVER_BE_PATH }}
+            source ~/.zshrc
+            git pull
+            npx kill-port 3000
+            nvm exec 12.14.1 forever start index.js
